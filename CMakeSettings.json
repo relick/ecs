@@ -11,24 +11,8 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "codeAnalysisRuleset": "CppCoreCheckRules.ruleset",
-      "intelliSenseMode": "windows-clang-x64",
-      "variables": [
-        {
-          "name": "BENCHMARK_ENABLE_INSTALL",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
-          "name": "BENCHMARK_ENABLE_GTEST_TESTS",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
-          "name": "GSL_CXX_STANDARD",
-          "value": "17",
-          "type": "STRING"
-        }
-      ]
+      "intelliSenseMode": "windows-msvc-x64",
+      "variables": []
     },
     {
       "name": "x64-Release",
@@ -41,24 +25,8 @@
       "ctestCommandArgs": "",
       "codeAnalysisRuleset": "CppCoreCheckRules.ruleset",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": [
-        {
-          "name": "BENCHMARK_ENABLE_INSTALL",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
-          "name": "BENCHMARK_ENABLE_GTEST_TESTS",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
-          "name": "GSL_CXX_STANDARD",
-          "value": "17",
-          "type": "STRING"
-        }
-      ],
-      "intelliSenseMode": "windows-clang-x64"
+      "variables": [],
+      "intelliSenseMode": "windows-msvc-x64"
     },
     {
       "name": "x64-Debug-clang",
@@ -72,22 +40,17 @@
       "inheritEnvironments": [ "clang_cl_x64" ],
       "variables": [
         {
-          "name": "BENCHMARK_ENABLE_INSTALL",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
           "name": "BENCHMARK_ENABLE_GTEST_TESTS",
           "value": "False",
           "type": "BOOL"
         },
         {
-          "name": "GSL_CXX_STANDARD",
-          "value": "17",
-          "type": "STRING"
+          "name": "BENCHMARK_ENABLE_INSTALL",
+          "value": "False",
+          "type": "BOOL"
         }
       ],
-      "intelliSenseMode": "windows-clang-x64"
+      "intelliSenseMode": "windows-msvc-x64"
     },
     {
       "name": "x64-Release-clang",
@@ -101,22 +64,17 @@
       "inheritEnvironments": [ "clang_cl_x64" ],
       "variables": [
         {
-          "name": "BENCHMARK_ENABLE_INSTALL",
-          "value": "False",
-          "type": "BOOL"
-        },
-        {
           "name": "BENCHMARK_ENABLE_GTEST_TESTS",
           "value": "False",
           "type": "BOOL"
         },
         {
-          "name": "GSL_CXX_STANDARD",
-          "value": "17",
-          "type": "STRING"
+          "name": "BENCHMARK_ENABLE_INSTALL",
+          "value": "False",
+          "type": "BOOL"
         }
       ],
-      "intelliSenseMode": "windows-clang-x64"
-    },
+      "intelliSenseMode": "windows-msvc-x64"
+    }
   ]
 }

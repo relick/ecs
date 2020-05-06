@@ -5,41 +5,31 @@
 // to compare interfaces
 
 struct position {
-	float x;
-	float y;
+    float x;
+    float y;
 };
 
 struct velocity {
-	float dx;
-	float dy;
+    float dx;
+    float dy;
 };
-
-struct frame {
-	ecs_flags(ecs::shared, ecs::immutable); // kind of like a 'static const' member function
-	float dt;
-};
-
-auto& zero_vel = ecs::make_system([](velocity& vel) {
-	vel.dx = 0.;
-	vel.dy = 0.;
-});
-
-auto& update_pos = ecs::make_system([](position& pos, velocity const& vel, frame const& frame) {
-	pos.x += vel.dx * frame.dt;
-	pos.y += vel.dy * frame.dt;
-});
 
 int main() {
-	// Set up the entities in range [0, 9]
-	ecs::entity_range const ents{ 0, 9,
-		[](ecs::entity_id ent) { return position{ ent * 1.f, ent * 1.f }; },
-		[](ecs::entity_id ent) { return velocity{ ent * 1.f, ent * 1.f }; },
-		frame{}
-	};
+    float const dt = 1.0f / 60.f;
 
-	// Set the 'frame' delta time
-	ecs::get_shared_component<frame>().dt = 1.0f / 60.f;
+    ecs::make_system([&dt](position& pos, velocity const& vel) {
+        pos.x += vel.dx * dt;
+        pos.y += vel.dy * dt;
+    });
 
-	// Run the systems
-	ecs::update_systems();
+    ecs::make_system([](velocity& vel) {
+        vel.dx = 0.;
+        vel.dy = 0.;
+    });
+
+    ecs::add_components({0, 9}, [](auto id) { return position{id * 1.f, id * 1.f}; });
+    ecs::add_components({0, 4}, [](auto id) { return velocity{id * 1.f, id * 1.f}; });
+
+    // Run the systems
+    ecs::update_systems();
 }

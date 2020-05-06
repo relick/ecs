@@ -1,53 +1,78 @@
-#pragma once
+#ifndef __COMPONENT_SPECIFIER
+#define __COMPONENT_SPECIFIER
+
 #include <type_traits>
 
-namespace ecs
-{
-	// Add this in 'ecs_flags()' to mark a component as a tag.
-	// Uses O(1) memory instead of O(n).
-	struct tag {};
+namespace ecs {
+    // Add this in 'ecs_flags()' to mark a component as a tag.
+    // Uses O(1) memory instead of O(n).
+    // Mutually exclusive with 'share' and 'global'
+    struct tag {};
 
-	// Add this in 'ecs_flags()' to mark a component as shared between components,
-	// meaning that any entity with a shared component will all point to the same component.
-	// Think of it as a static member variable in a regular class.
-	// Uses O(1) memory instead of O(n).
-	struct shared {};
+    // Add this in 'ecs_flags()' to mark a component as shared between components,
+    // meaning that any entity with a shared component will all point to the same component.
+    // Think of it as a static member variable in a regular class.
+    // Uses O(1) memory instead of O(n).
+    // Mutually exclusive with 'tag' and 'global'
+    struct share {};
 
-	// Add this in 'ecs_flags()' to mark a component as transient.
-	// The component will only exist on an entity for one cycle,
-	// and then be automatically removed.
-	struct transient {};
+    // Add this in 'ecs_flags()' to mark a component as transient.
+    // The component will only exist on an entity for one cycle,
+    // and then be automatically removed.
+    // Mutually exclusive with 'global'
+    struct transient {};
 
-	// Add this in 'ecs_flags()' to mark a component as constant.
-	// A compile-time error will be raised if a system tries to
-	// access the component through a non-const reference.
-	struct immutable {};
+    // Add this in 'ecs_flags()' to mark a component as constant.
+    // A compile-time error will be raised if a system tries to
+    // access the component through a non-const reference.
+    struct immutable {};
 
-	// Add flags to a component to change its behaviour and memory usage.
-	// Example:
-	// struct my_component {
-	// 	ecs_flags(ecs::tag, ecs::transient);
-	// 	// component data
-	// };
-	#define ecs_flags(...) struct _ecs_flags : __VA_ARGS__ {};
+    // Add this is 'ecs_flags()' to mark a component as global.
+    // Global components can be referenced from systems without
+    // having been added to any entities.
+    // Uses O(1) memory instead of O(n).
+    // Mutually exclusive with 'tag', 'share', and 'transient'
+    struct global {};
 
-	namespace detail {
-		template <typename T> constexpr auto is_tagged(...)    -> bool { return false; }
-		template <typename T> constexpr auto is_shared(...)    -> bool { return false; }
-		template <typename T> constexpr auto is_transient(...) -> bool { return false; }
-		template <typename T> constexpr auto is_immutable(...) -> bool { return false; }
+// Add flags to a component to change its behaviour and memory usage.
+// Example:
+// struct my_component {
+// 	ecs_flags(ecs::tag, ecs::transient);
+// 	// component data
+// };
+#define ecs_flags(...)                                                                                                 \
+    struct _ecs_flags : __VA_ARGS__ {};
 
-		template <typename T> constexpr auto is_tagged(int)    -> decltype(typename T::_ecs_flags{}, bool{}) { return std::is_base_of_v<ecs::tag, typename T::_ecs_flags>; }
-		template <typename T> constexpr auto is_shared(int)    -> decltype(typename T::_ecs_flags{}, bool{}) { return std::is_base_of_v<ecs::shared, typename T::_ecs_flags>; }
-		template <typename T> constexpr auto is_transient(int) -> decltype(typename T::_ecs_flags{}, bool{}) { return std::is_base_of_v<ecs::transient, typename T::_ecs_flags>; }
-		template <typename T> constexpr auto is_immutable(int) -> decltype(typename T::_ecs_flags{}, bool{}) { return std::is_base_of_v<ecs::immutable, typename T::_ecs_flags>; }
+    // Some helpers
+    namespace detail {
+        template<typename T>
+        using flags = typename std::remove_cvref_t<T>::_ecs_flags;
 
-		// Some helpers
-		template <class T> constexpr static bool is_tagged_v = is_tagged<T>(0);
-		template <class T> constexpr static bool is_shared_v = is_shared<T>(0);
-		template <class T> constexpr static bool is_transient_v = is_transient<T>(0);
-		template <class T> constexpr static bool is_immutable_v = is_immutable<T>(0);
+        template<typename T>
+        concept tagged = std::is_base_of_v<ecs::tag, flags<T>>;
 
-		template <class T> constexpr static bool is_static_v = (is_shared_v<T> || is_tagged_v<T>); // all entities point to the same component
-	}
-}
+        template<typename T>
+        concept shared = std::is_base_of_v<ecs::share, flags<T>>;
+
+        template<typename T>
+        concept transient = std::is_base_of_v<ecs::transient, flags<T>>;
+
+        template<typename T>
+        concept immutable = std::is_base_of_v<ecs::immutable, flags<T>>;
+
+        template<typename T>
+        concept global = std::is_base_of_v<ecs::global, flags<T>>;
+
+        template<typename T>
+        concept local = !global<T>;
+
+        template<typename T>
+        concept persistent = !transient<T>;
+
+        template<typename T>
+        concept unbound = (shared<T> || tagged<T> ||
+                           global<T>); // component is not bound to a specific entity (ie static)
+    }                                  // namespace detail
+} // namespace ecs
+
+#endif // !__COMPONENT_SPECIFIER

@@ -1,23 +1,25 @@
-#pragma once
-#include <cstdint>
-#include <numeric>
+#ifndef __ENTITY_ID
+#define __ENTITY_ID
 
-namespace ecs
-{
-	// Use a struct so the typesystem can differentiate
-	// between entity ids and regular integers in system arguments
-	struct entity_id final
-	{
-		// Uninitialized entity ids are not allowed, because they make no sense
-		entity_id() = delete;
-		entity_id(std::int32_t _id) noexcept
-			: id(_id)
-		{ }
+namespace ecs {
+    using entity_type = int;
+    using entity_offset = unsigned int; // must cover the entire entity_type domain
 
-		operator std::int32_t& () noexcept { return id; }
-		operator std::int32_t () const noexcept { return id; }
+    // A simple struct that is an entity identifier.
+    // Use a struct so the typesystem can differentiate
+    // between entity ids and regular integers in system arguments
+    struct entity_id final {
+        // Uninitialized entity ids are not allowed, because they make no sense
+        entity_id() = delete;
 
-	private:
-		std::int32_t id;
-	};
-}
+        constexpr entity_id(entity_type _id) noexcept : id(_id) {}
+
+        constexpr operator entity_type&() noexcept { return id; }
+        constexpr operator entity_type() const noexcept { return id; }
+
+    private:
+        entity_type id;
+    };
+} // namespace ecs
+
+#endif // !__ENTITY_ID

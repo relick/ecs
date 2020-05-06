@@ -1,7 +1,17 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.15)
 
-add_executable (unittests "unittest.cpp" "component deletion.cpp" "component_pool.cpp" "entity sorting.cpp" "missing storage.cpp" "mutable lambdas.cpp" "range intersect.cpp" "ranged add.cpp" "shared component.cpp" "system argument ordering.cpp" "system.cpp" "transient components.cpp" "two systems and components.cpp" "two-component system.cpp")
+add_executable (unittests
+	"unittest.cpp"
+	"constexpr.cpp"
+	"runtime.cpp"
+	"component removal.cpp"
+	"component_pool.cpp"
+	"entity_range.cpp"
+	"shared component.cpp"
+	"system.cpp"
+	"transient components.cpp"
+	"global_component.cpp"
+	"sorting.cpp" "filtering.cpp")
 target_link_libraries(unittests ecs)
-
 
 add_test(unittests unittests)
