@@ -69,7 +69,7 @@ int main() {
     add_systems();
 
     // Create the finite state machine entity with the initial state of idle
-    ecs::entity fsm{0, state_idle{}};
+    ecs::entity const fsm{0, state_idle{}};
     ecs::commit_changes();
 
     // Add a 'connect' event to the fsm, and commit and run any appropiate systems.

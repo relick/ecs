@@ -108,7 +108,7 @@ TEST_CASE("System specification", "[system]") {
     }
 
     SECTION("Components are passed in the correct order to the system") {
-        ecs::detail::_context.reset();
+        ecs::detail::get_context().reset();
 
         struct C_Order1 {
             unsigned i;

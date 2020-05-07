@@ -17,10 +17,10 @@ namespace ecs::detail {
     template<bool ignore_first_arg, typename First, typename... Types>
     constexpr auto get_type_hashes_array() {
         if constexpr (!ignore_first_arg) {
-            std::array<detail::type_hash, 1 + sizeof...(Types)> arr{get_type_hash<First>(), get_type_hash<Types>()...};
+            std::array<detail::type_hash, 1 + sizeof...(Types)> const arr{get_type_hash<First>(), get_type_hash<Types>()...};
             return arr;
         } else {
-            std::array<detail::type_hash, sizeof...(Types)> arr{get_type_hash<Types>()...};
+            std::array<detail::type_hash, sizeof...(Types)> const arr{get_type_hash<Types>()...};
             return arr;
         }
     }
@@ -33,10 +33,10 @@ namespace ecs::detail {
     template<bool ignore_first_arg, typename First, typename... Types>
     constexpr auto get_type_read_only() {
         if constexpr (!ignore_first_arg) {
-            std::array<bool, 1 + sizeof...(Types)> arr{is_read_only<First>(), is_read_only<Types>()...};
+            std::array<bool, 1 + sizeof...(Types)> const arr{is_read_only<First>(), is_read_only<Types>()...};
             return arr;
         } else {
-            std::array<bool, sizeof...(Types)> arr{is_read_only<Types>()...};
+            std::array<bool, sizeof...(Types)> const arr{is_read_only<Types>()...};
             return arr;
         }
     }
@@ -145,9 +145,9 @@ namespace ecs::detail {
                 using sort_type = sort_func_type<SortFunc>;
                 // if get_pool is_data_modified
                 std::sort(sorted_arguments.begin(), sorted_arguments.end(), [this](auto const& l, auto const& r) {
-                    sort_type* t_l = std::get<sort_type*>(l);
-                    sort_type* t_r = std::get<sort_type*>(r);
-                    return sort_func(*t_l, *t_r);
+                    sort_type const& t_l = *std::get<sort_type*>(l);
+                    sort_type const& t_r = *std::get<sort_type*>(r);
+                    return sort_func(t_l, t_r);
                 });
 
                 std::for_each(
@@ -177,9 +177,9 @@ namespace ecs::detail {
                     auto const& range = std::get<entity_range>(argument);
                     std::for_each(ExecutionPolicy{}, range.begin(), range.end(),
                         [extract_arg, this, &argument, first_id = range.first()](auto ent) {
-                            auto const offset = ent - first_id;
+                            auto const offset = ent.get_id() - first_id;
                             if constexpr (is_first_arg_entity) {
-                                update_func(ent, extract_arg(std::get<rcv<Components>*>(argument), offset)...);
+                                update_func(ent.get_id(), extract_arg(std::get<rcv<Components>*>(argument), offset)...);
                             } else {
                                 update_func(extract_arg(std::get<rcv<FirstComponent>*>(argument), offset),
                                     extract_arg(std::get<rcv<Components>*>(argument), offset)...);
@@ -191,7 +191,7 @@ namespace ecs::detail {
 
         constexpr int get_group() const noexcept override { return Group; }
 
-        std::string get_signature() const noexcept override {
+        std::string get_signature() const override {
             std::string sig("system(");
             for (size_t i = 0; i < num_arguments - 1; i++) {
                 sig += argument_names[i];
@@ -212,14 +212,14 @@ namespace ecs::detail {
             return type_hashes.end() != std::find(type_hashes.begin(), type_hashes.end(), hash);
         }
 
-        constexpr bool depends_on(system_base const* other) const noexcept override {
+        constexpr bool depends_on(system_base const& other) const noexcept override {
             for (auto hash : get_type_hashes()) {
                 // If the other system doesn't touch the same component,
                 // then there can be no dependecy
-                if (!other->has_component(hash))
+                if (!other.has_component(hash))
                     continue;
 
-                bool const other_writes = other->writes_to_component(hash);
+                bool const other_writes = other.writes_to_component(hash);
                 if (other_writes) {
                     // The other system writes to the component,
                     // so there is a strong dependency here.
@@ -273,7 +273,7 @@ namespace ecs::detail {
                 return;
             }
 
-            auto constexpr is_pools_modified = [](auto... pools) { return (pools->is_data_modified() || ...); };
+            auto constexpr is_pools_modified = [](auto... pools) noexcept { return (pools->is_data_modified() || ...); };
             bool const is_modified = std::apply(is_pools_modified, pools);
 
             if (is_modified) {
@@ -377,7 +377,7 @@ namespace ecs::detail {
                         if (ranges.has_value()) {
                             ranges = intersect_ranges(*ranges, type_pool.get_entities());
                         } else {
-                            auto span = type_pool.get_entities();
+                            auto const span = type_pool.get_entities();
                             ranges.emplace(span.begin(), span.end());
                         }
                     }
@@ -386,7 +386,7 @@ namespace ecs::detail {
                 auto const difference = [&, this](auto arg) { // arg = rcv<Components>*
                     using type = std::remove_pointer_t<decltype(arg)>;
                     if constexpr (std::is_pointer_v<type>) {
-                        auto& type_pool = get_pool<std::remove_pointer_t<type>>();
+                        auto const& type_pool = get_pool<std::remove_pointer_t<type>>();
                         ranges = difference_ranges(*ranges, type_pool.get_entities());
                     }
                 };
@@ -413,12 +413,13 @@ namespace ecs::detail {
                 sorted_arguments.clear();
                 sorted_arguments.reserve(arg_count);
                 for (auto const& args : arguments) {
-                    for (entity_id const& entity : std::get<0>(args)) {
+                    for (entity const& entity : std::get<0>(args)) {
                         if constexpr (is_first_arg_entity) {
-                            sorted_arguments.emplace_back(entity, get_component<rcv<Components>>(entity)...);
+                            sorted_arguments.emplace_back(
+                                entity.get_id(), get_component<rcv<Components>>(entity.get_id())...);
                         } else {
-                            sorted_arguments.emplace_back(entity, get_component<rcv<FirstComponent>>(entity),
-                                get_component<rcv<Components>>(entity)...);
+                            sorted_arguments.emplace_back(entity.get_id(), get_component<rcv<FirstComponent>>(entity.get_id()),
+                                get_component<rcv<Components>>(entity.get_id())...);
                         }
                     }
                 }
@@ -440,12 +441,12 @@ namespace ecs::detail {
         }
 
         template<typename Component>
-        [[nodiscard]] component_pool<Component>& get_pool() const {
+        [[nodiscard]] component_pool<Component>& get_pool() const noexcept {
             return *std::get<pool<Component>>(pools);
         }
 
         template<typename Component>
-        [[nodiscard]] Component* get_component(entity_id const entity) {
+        [[nodiscard]] Component* get_component(entity_id const entity) noexcept {
             if constexpr (std::is_pointer_v<Component>) {
                 static_cast<void>(entity);
                 static Component* dummy = nullptr;

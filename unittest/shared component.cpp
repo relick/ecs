@@ -9,7 +9,7 @@ TEST_CASE("Shared components", "[component][shared]") {
             int i = 0;
         };
 
-        ecs::detail::_context.reset();
+        ecs::detail::get_context().reset();
 
         auto& pst = ecs::get_shared_component<test_s>();
         pst.i = 42;

@@ -50,10 +50,8 @@ void do_spread_logic(ecs::entity self, plague& p) {
         p.spread_duration += plague::spread_tick;
 
         // Do a spread tick. Use hardcoded entities for simplicitys sake
-        auto ents_in_range = {
-            ecs::entity{1},
-            ecs::entity{2}}; /* should find all entities (with health component) in spread_range using game logic */
-        for (auto ent : ents_in_range) {
+        auto ents_in_range = ecs::entity_range{1, 2}; /* should find all entities (with health component) in spread_range using game logic */
+        for (auto const ent : ents_in_range) {
             if (!ent.has<plague>()) {
                 // Add a copy of the plague component if the entity doesn't already have it.
                 // This means that newly infected entities are only affected for

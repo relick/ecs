@@ -29,7 +29,7 @@ struct runtime_ctr_counter {
 
 TEST_CASE("The runtime interface") {
     SECTION("Does perfect forwarding correctly") {
-        ecs::detail::_context.reset();
+        ecs::detail::get_context().reset();
         ecs::add_component({0, 9}, runtime_ctr_counter{});
         ecs::commit_changes();
 
@@ -38,7 +38,7 @@ TEST_CASE("The runtime interface") {
         CHECK(runtime_ctr_counter::dtr_count == 1 + 2);
         CHECK(runtime_ctr_counter::copy_count == 10);
 
-        ecs::detail::_context.reset();
+        ecs::detail::get_context().reset();
         CHECK(runtime_ctr_counter::dtr_count == 1 + 2 + 10);
     }
 

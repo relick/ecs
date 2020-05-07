@@ -38,13 +38,13 @@ namespace ecs {
         }
 
         // Returns true if this system is enabled
-        [[nodiscard]] bool is_enabled() const { return enabled; }
+        [[nodiscard]] bool is_enabled() const noexcept { return enabled; }
 
         // Returns the group this system belongs to
         [[nodiscard]] virtual int get_group() const noexcept = 0;
 
         // Get the signature of the system
-        [[nodiscard]] virtual std::string get_signature() const noexcept = 0;
+        [[nodiscard]] virtual std::string get_signature() const = 0;
 
         // Get the hashes of types used by the system with const/reference qualifiers removed
         [[nodiscard]] virtual std::span<detail::type_hash const>
@@ -54,7 +54,7 @@ namespace ecs {
         [[nodiscard]] virtual bool has_component(detail::type_hash hash) const noexcept = 0;
 
         // Returns true if this system has a dependency on another system
-        [[nodiscard]] virtual bool depends_on(system_base const*) const noexcept = 0;
+        [[nodiscard]] virtual bool depends_on(system_base const&) const noexcept = 0;
 
         // Returns true if this system writes data to any component
         [[nodiscard]] virtual bool writes_to_any_components() const noexcept = 0;

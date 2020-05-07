@@ -26,7 +26,7 @@ namespace ecs {
         static_assert(!std::is_same_v<ComponentType, void>, "Initializer functions must return a component");
 
         // Add it to the component pool
-        detail::component_pool<ComponentType>& pool = detail::_context.get_component_pool<ComponentType>();
+        detail::component_pool<ComponentType>& pool = detail::get_context().get_component_pool<ComponentType>();
         pool.add_init(range, std::forward<Callable>(func));
     }
 
@@ -38,7 +38,7 @@ namespace ecs {
         static_assert(std::copyable<T>, "T must be copyable");
 
         // Add it to the component pool
-        detail::component_pool<T>& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T>& pool = detail::get_context().get_component_pool<T>();
         pool.add(range, std::forward<T>(val));
     }
 
@@ -70,7 +70,7 @@ namespace ecs {
     template<detail::persistent T>
     void remove_component(entity_range const range) {
         // Remove the entities from the components pool
-        detail::component_pool<T>& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T>& pool = detail::get_context().get_component_pool<T>();
         pool.remove_range(range);
     }
 
@@ -84,20 +84,20 @@ namespace ecs {
     // Returns a shared component. Can be called before a system for it has been added
     template<detail::shared T>
     T& get_shared_component() {
-        return detail::_context.get_component_pool<T>().get_shared_component();
+        return detail::get_context().get_component_pool<T>().get_shared_component();
     }
 
     // Returns a global component.
     template<detail::global T>
     T& get_global_component() {
-        return detail::_context.get_component_pool<T>().get_shared_component();
+        return detail::get_context().get_component_pool<T>().get_shared_component();
     }
 
     // Returns the component from an entity, or nullptr if the entity is not found
     template<detail::local T>
     T* get_component(entity_id const id) {
         // Get the component pool
-        detail::component_pool<T>& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T>& pool = detail::get_context().get_component_pool<T>();
         return pool.find_component_data(id);
     }
 
@@ -110,57 +110,57 @@ namespace ecs {
             return {};
 
         // Get the component pool
-        detail::component_pool<T>& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T>& pool = detail::get_context().get_component_pool<T>();
         return {pool.find_component_data(range.first()), range.count()};
     }
 
     // Returns the number of active components
     template<typename T>
     size_t get_component_count() {
-        if (!detail::_context.has_component_pool<T>())
+        if (!detail::get_context().has_component_pool<T>())
             return 0;
 
         // Get the component pool
-        detail::component_pool<T> const& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T> const& pool = detail::get_context().get_component_pool<T>();
         return pool.num_components();
     }
 
     // Returns the number of entities that has the component.
     template<typename T>
     size_t get_entity_count() {
-        if (!detail::_context.has_component_pool<T>())
+        if (!detail::get_context().has_component_pool<T>())
             return 0;
 
         // Get the component pool
-        detail::component_pool<T> const& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T> const& pool = detail::get_context().get_component_pool<T>();
         return pool.num_entities();
     }
 
     // Return true if an entity contains the component
     template<typename T>
     bool has_component(entity_id const id) {
-        if (!detail::_context.has_component_pool<T>())
+        if (!detail::get_context().has_component_pool<T>())
             return false;
 
-        detail::component_pool<T> const& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T> const& pool = detail::get_context().get_component_pool<T>();
         return pool.has_entity(id);
     }
 
     // Returns true if all entities in a range has the component.
     template<typename T>
     bool has_component(entity_range const range) {
-        if (!detail::_context.has_component_pool<T>())
+        if (!detail::get_context().has_component_pool<T>())
             return false;
 
-        detail::component_pool<T>& pool = detail::_context.get_component_pool<T>();
+        detail::component_pool<T> const& pool = detail::get_context().get_component_pool<T>();
         return pool.has_entity(range);
     }
 
     // Commits the changes to the entities.
-    inline void commit_changes() { detail::_context.commit_changes(); }
+    inline void commit_changes() { detail::get_context().commit_changes(); }
 
     // Calls the 'update' function on all the systems in the order they were added.
-    inline void run_systems() { detail::_context.run_systems(); }
+    inline void run_systems() { detail::get_context().run_systems(); }
 
     // Commits all changes and calls the 'update' function on all the systems in the order they were
     // added. Same as calling commit_changes() and run_systems().
@@ -172,28 +172,28 @@ namespace ecs {
     // Make a new system
     template<int Group = 0, detail::lambda UpdateFunc>
     auto& make_system(UpdateFunc update_func) {
-        return detail::_context.create_system<Group, std::execution::sequenced_policy, UpdateFunc>(
+        return detail::get_context().create_system<Group, std::execution::sequenced_policy, UpdateFunc>(
             update_func, &UpdateFunc::operator());
     }
 
     // Make a new system with a sort function attached
     template<int Group = 0, detail::lambda UpdateFunc, detail::sorter SortFunc>
     auto& make_system(UpdateFunc update_func, SortFunc sort_func) {
-        return detail::_context.create_system<Group, std::execution::sequenced_policy, UpdateFunc, SortFunc>(
+        return detail::get_context().create_system<Group, std::execution::sequenced_policy, UpdateFunc, SortFunc>(
             update_func, sort_func, &UpdateFunc::operator());
     }
 
     // Make a new system. It will process components in parallel.
     template<int Group = 0, detail::lambda UpdateFunc>
     auto& make_parallel_system(UpdateFunc update_func) {
-        return detail::_context.create_system<Group, std::execution::parallel_unsequenced_policy, UpdateFunc>(
+        return detail::get_context().create_system<Group, std::execution::parallel_unsequenced_policy, UpdateFunc>(
             update_func, &UpdateFunc::operator());
     }
 
     // Make a new system. It will process components in parallel.
     template<int Group = 0, detail::lambda UpdateFunc, detail::sorter SortFunc>
     auto& make_parallel_system(UpdateFunc update_func, SortFunc sort_func) {
-        return detail::_context.create_system<Group, std::execution::parallel_unsequenced_policy, UpdateFunc, SortFunc>(
+        return detail::get_context().create_system<Group, std::execution::parallel_unsequenced_policy, UpdateFunc, SortFunc>(
             update_func, sort_func, &UpdateFunc::operator());
     }
 } // namespace ecs

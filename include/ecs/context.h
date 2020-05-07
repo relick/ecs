@@ -98,7 +98,7 @@ namespace ecs::detail {
                 }
             });
 
-            return *static_cast<component_pool<NakedType>*>(pool);
+            [[gsl::suppress(type.2)]] return *static_cast<component_pool<NakedType>*>(pool);
         }
 
         // Const lambda
@@ -151,7 +151,7 @@ namespace ecs::detail {
             system_base* ptr_system = systems.back().get();
             Ensures(ptr_system != nullptr);
 
-            sched.insert(ptr_system);
+            sched.insert(*ptr_system);
 
             return *ptr_system;
         }
@@ -177,9 +177,6 @@ namespace ecs::detail {
         static context ctx;
         return ctx;
     }
-
-    // The global reference to the context
-    static inline context& _context = get_context();
 } // namespace ecs::detail
 
 #endif // !__CONTEXT

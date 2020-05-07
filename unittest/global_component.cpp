@@ -8,7 +8,7 @@ TEST_CASE("Global component", "[component][global]") {
         int i = 0;
     };
 
-    ecs::detail::_context.reset();
+    ecs::detail::get_context().reset();
 
     auto& pst = ecs::get_global_component<test_s>();
     pst.i = 42;

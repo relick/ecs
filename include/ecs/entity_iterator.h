@@ -3,6 +3,7 @@
 
 #include "contract.h"
 #include "entity_id.h"
+#include "entity.h"
 #include <iterator>
 #include <limits>
 
@@ -46,7 +47,7 @@ namespace ecs /*::detail*/ {
 
         constexpr bool operator!=(entity_iterator other) const { return !(*this == other); }
 
-        constexpr entity_id operator*() { return {ent_}; }
+        constexpr entity operator*() { return {ent_}; }
 
     protected:
         constexpr entity_type step(entity_type start, entity_offset diff) const {

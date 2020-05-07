@@ -6,7 +6,7 @@
 // Test to make sure components are properly removed from systems.
 // This is based on a bug that was exposed by the 'finite_state_machine' example.
 TEST_CASE("Component removal", "[component][transient]") {
-    ecs::detail::_context.reset();
+    ecs::detail::get_context().reset();
 
     struct state_idle {};
     struct state_connecting {};

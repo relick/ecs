@@ -55,7 +55,7 @@ void raw_update(benchmark::State& state) {
 
 	std::vector<int> colors(nentities);
 	for ([[maybe_unused]] auto const _ : state) {
-		ecs::detail::_context.reset();
+        ecs::detail::get_context().reset();
 
 		auto & shared = ecs::get_shared_component<shared_s>();
 		shared.dimension = nentities;
@@ -72,7 +72,7 @@ void system_update(benchmark::State& state) {
 	auto const nentities = static_cast<ecs::entity_type>(state.range(0));
 
 	for ([[maybe_unused]] auto const _ : state) {
-		ecs::detail::_context.reset();
+		ecs::detail::get_context().reset();
 
 		ecs::make_system(benchmark_system);
 		ecs::get_shared_component<shared_s>().dimension = nentities;
@@ -87,7 +87,7 @@ void system_update_parallel(benchmark::State& state) {
 	auto const nentities = static_cast<ecs::entity_type>(state.range(0));
 
 	for ([[maybe_unused]] auto const _ : state) {
-		ecs::detail::_context.reset();
+		ecs::detail::get_context().reset();
 
 		ecs::make_parallel_system(benchmark_system);
 		ecs::get_shared_component<shared_s>().dimension = nentities;
@@ -103,7 +103,7 @@ void component_add(benchmark::State& state) {
 
 	for ([[maybe_unused]] auto const _ : state) {
 		state.PauseTiming();
-			ecs::detail::_context.reset();
+			ecs::detail::get_context().reset();
 			ecs::make_system([](ecs::entity /*ent*/, size_t const& /*unused*/) { });
 		state.ResumeTiming();
 
@@ -125,7 +125,7 @@ void component_randomized_add(benchmark::State& state) {
 
 	for ([[maybe_unused]] auto const _ : state) {
 		state.PauseTiming();
-			ecs::detail::_context.reset();
+			ecs::detail::get_context().reset();
 			ecs::make_system(benchmark_system);
 			ecs::get_shared_component<shared_s>().dimension = nentities;
 		state.ResumeTiming();
@@ -143,7 +143,7 @@ void component_remove(benchmark::State& state) {
 
 	for ([[maybe_unused]] auto const _ : state) {
 		state.PauseTiming();
-			ecs::detail::_context.reset();
+            ecs::detail::get_context().reset();
 			ecs::make_system(benchmark_system);
 			ecs::get_shared_component<shared_s>().dimension = nentities;
 		state.ResumeTiming();

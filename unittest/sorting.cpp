@@ -6,7 +6,7 @@ auto constexpr sort_asc = [](int const& l, int const& r) { return l < r; };
 auto constexpr sort_dec = [](int const& l, int const& r) { return l > r; };
 
 TEST_CASE("Sorting") {
-    ecs::detail::_context.reset();
+    ecs::detail::get_context().reset();
 
     ecs::add_components({0, 9}, generator);
     ecs::commit_changes();

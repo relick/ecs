@@ -73,7 +73,7 @@ namespace ecs::detail {
         }
 
         // Return the shared component
-        T& get_shared_component() requires unbound<T> {
+        T& get_shared_component() noexcept requires unbound<T> {
             static T t{};
             return t;
         }
@@ -98,7 +98,7 @@ namespace ecs::detail {
         }
 
         // Returns the shared component
-        T* find_component_data(entity_id const /*id*/) requires unbound<T> {
+        T* find_component_data(entity_id const /*id*/) noexcept requires unbound<T> {
             return &get_shared_component();
         }
 
@@ -106,7 +106,7 @@ namespace ecs::detail {
         // Returns nullptr if the entity is not found in this pool
         T* find_component_data(entity_id const id) {
             auto const index = find_entity_index(id);
-            return index ? &components[index.value()] : nullptr;
+            return index ? &components.at(index.value()) : nullptr;
         }
 
         // Merge all the components queued for addition to the main storage,
@@ -120,12 +120,12 @@ namespace ecs::detail {
         size_t num_entities() const {
             // Don't want to include <algorithm> just for this
             size_t val = 0;
-            for (auto r : ranges) { val += r.count(); }
+            for (auto const& r : ranges) { val += r.count(); }
             return val;
         }
 
         // Returns the number of active components in the pool
-        size_t num_components() const {
+        size_t num_components() const noexcept {
             if constexpr (unbound<T>)
                 return 1;
             else
@@ -133,19 +133,19 @@ namespace ecs::detail {
         }
 
         // Clears the pools state flags
-        void clear_flags() override {
+        void clear_flags() noexcept override {
             data_added = false;
             data_removed = false;
         }
 
         // Returns true if components has been added since last clear_flags() call
-        bool is_data_added() const { return data_added; }
+        bool is_data_added() const noexcept { return data_added; }
 
         // Returns true if components has been removed since last clear_flags() call
-        bool is_data_removed() const { return data_removed; }
+        bool is_data_removed() const noexcept { return data_removed; }
 
         // Returns true if components has been added/removed since last clear_flags() call
-        bool is_data_modified() const { return data_added || data_removed; }
+        bool is_data_modified() const noexcept { return data_added || data_removed; }
 
         // Returns the pools entities
         entity_range_view get_entities() const {
@@ -219,7 +219,7 @@ namespace ecs::detail {
         }
 
         // Clear all entities from the pool
-        void clear() override {
+        void clear() noexcept override {
             // Remember if components was removed from the pool
             bool const is_removed = !components.empty();
 
@@ -236,10 +236,10 @@ namespace ecs::detail {
 
     private:
         // Flag that components has been added
-        void set_data_added() { data_added = true; }
+        void set_data_added() noexcept { data_added = true; }
 
         // Flag that components has been removed
-        void set_data_removed() { data_removed = true; }
+        void set_data_removed() noexcept { data_removed = true; }
 
         // Searches for an entitys offset in to the component pool.
         // Returns nothing if 'ent' is not a valid entity
@@ -361,7 +361,7 @@ namespace ecs::detail {
         }
 
         // Removes the entities and components
-        void process_remove_components() {
+        void process_remove_components() noexcept(detail::transient<T>) {
             // Transient components are removed each cycle
             if constexpr (detail::transient<T>) {
                 if (!ranges.empty()) {

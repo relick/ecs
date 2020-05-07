@@ -14,7 +14,7 @@ namespace ecs::detail {
     struct scheduler_node {
         // Construct a node from a system.
         // The system can not be null
-        scheduler_node(system_base* sys) : sys(sys) {
+        scheduler_node(system_base* sys) noexcept : sys(sys) {
             Expects(sys != nullptr);
         }
 
@@ -27,14 +27,14 @@ namespace ecs::detail {
             children.push_back(node_index);
         }
 
-        void increase_parent_count() {
+        void increase_parent_count() noexcept {
             Expects(total_parents !=
                     std::numeric_limits<uint16_t>::max()); // You have 32k dependencies on a single
                                                            // system. Just delete your code.
             total_parents += 1;
         }
 
-        void reset_run() {
+        void reset_run() noexcept {
             unfinished_parents = total_parents;
         }
 
@@ -53,8 +53,8 @@ namespace ecs::detail {
 
             sys->update();
 
-            std::for_each(std::execution::par, children.begin(), children.end(),
-                          [&nodes](auto node) { nodes[node].run(nodes); });
+            std::for_each(
+                std::execution::par, children.begin(), children.end(), [&nodes](auto node) { nodes.at(node).run(nodes); });
         }
 
     private:
@@ -78,7 +78,7 @@ namespace ecs::detail {
             std::vector<std::size_t> entry_nodes{};
 
             void run(size_t node_index) {
-                all_nodes[node_index].run(all_nodes);
+                all_nodes.at(node_index).run(all_nodes);
             }
         };
 
@@ -105,18 +105,18 @@ namespace ecs::detail {
         }
 
     public:
-        void insert(system_base* sys) {
+        void insert(system_base& sys) {
             // Find the group
-            auto& group = find_group(sys->get_group());
+            auto& group = find_group(sys.get_group());
 
             // Create a new node with the system
             size_t const node_index = group.all_nodes.size();
-            scheduler_node& node = group.all_nodes.emplace_back(sys);
+            scheduler_node& node = group.all_nodes.emplace_back(&sys);
 
             // Find a dependant system for each component
             bool inserted = false;
             auto const end = group.all_nodes.rend();
-            for (auto const hash : sys->get_type_hashes()) {
+            for (auto const hash : sys.get_type_hashes()) {
                 auto it =
                     std::next(group.all_nodes.rbegin()); // 'next' to skip the newly added system
                 while (it != end) {
@@ -125,7 +125,7 @@ namespace ecs::detail {
                     // then there can be no dependecy
                     if (dep_node.get_system()->has_component(hash)) {
                         if (dep_node.get_system()->writes_to_component(hash) ||
-                            sys->writes_to_component(hash)) {
+                            sys.writes_to_component(hash)) {
                             // The system writes to the component,
                             // so there is a strong dependency here.
                             inserted = true;

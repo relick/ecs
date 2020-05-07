@@ -13,12 +13,12 @@ namespace ecs::detail {
     template<class T>
     constexpr auto get_type_name() {
 #ifdef _MSC_VER
-        std::string_view fn = __FUNCSIG__;
+        std::string_view const fn = __FUNCSIG__;
         auto const type_start = fn.find("get_type_name<") + 14;
         auto const type_end = fn.rfind(">(void)");
         return fn.substr(type_start, type_end - type_start);
 #else
-        std::string_view fn = __PRETTY_FUNCTION__;
+        std::string_view const fn = __PRETTY_FUNCTION__;
         auto const type_start = fn.rfind("T = ") + 4;
         auto const type_end = fn.rfind("]");
         return fn.substr(type_start, type_end - type_start);

@@ -2,7 +2,7 @@
 #include <ecs/ecs.h>
 
 TEST_CASE("Filtering", "[component][system]") {
-    ecs::detail::_context.reset();
+    ecs::detail::get_context().reset();
 
     ecs::add_components({0, 6}, int());
     ecs::add_components({3, 9}, float());

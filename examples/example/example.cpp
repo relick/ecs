@@ -38,7 +38,7 @@ int main() {
 
     std::cout << "\n# 4. Removing a component\n";
     // Remove the integer component from the 'sean' entity using the 'ecc::entity' helper class
-    ecs::entity sean{4};
+    ecs::entity const sean{4};
     sean.remove<int>(); // same as ecs::remove_component<int>(4);
 
     // Commit the changes and run the systems
