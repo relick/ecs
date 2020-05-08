@@ -1,8 +1,9 @@
 #ifndef __SYSTEM_VERIFICATION
 #define __SYSTEM_VERIFICATION
 
-#include <concepts>
-#include <type_traits>
+/*#include <concepts>
+#include <type_traits>*/
+import std.core;
 #include "component_specifier.h"
 
 namespace ecs::detail {

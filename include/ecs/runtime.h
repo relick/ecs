@@ -1,10 +1,11 @@
 #ifndef __RUNTIME
 #define __RUNTIME
 
-#include <concepts>
+/*#include <concepts>
 #include <utility>
 #include <type_traits>
-#include <execution>
+#include <execution>*/
+import std.core;
 #include "entity_id.h"
 #include "component_pool.h"
 #include "system_verification.h"

@@ -1,11 +1,12 @@
 #ifndef __SYSTEM
 #define __SYSTEM
 
-#include <type_traits>
+/*#include <type_traits>
 #include <tuple>
 #include <utility>
 #include <array>
-#include <vector>
+#include <vector>*/
+import std.core;
 
 #include "entity_id.h"
 #include "entity_range.h"
@@ -72,10 +73,10 @@ namespace ecs::detail {
 			std::tuple<entity_range, rcv<FirstComponent>*, rcv<Components>* ...>>;
 
 		// Component names
-		static constexpr std::array<std::string_view, num_arguments> argument_names = std::to_array({
+		static constexpr std::array<std::string_view, num_arguments> argument_names (
 			get_type_name<FirstComponent>(),
 			get_type_name<Components>()...
-		});
+		);
 
 		// Hashes of stripped types used by this system ('int' instead of 'int const&')
 		static constexpr std::array<detail::type_hash, num_components> type_hashes =

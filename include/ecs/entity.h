@@ -1,7 +1,8 @@
 #ifndef __ENTITY
 #define __ENTITY
 
-#include <concepts>
+//#include <concepts>
+import std.core;
 #include "entity_id.h"
 
 namespace ecs {

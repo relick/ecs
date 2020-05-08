@@ -1,10 +1,12 @@
 #ifndef __CONTEXT
 #define __CONTEXT
 
-#include <memory>
+/*#include <memory>
 #include <vector>
 #include <map>
-#include <shared_mutex>
+#include <shared_mutex>*/
+import std.core;
+import std.threading;
 #include <tls/cache.h>
 
 #include "component_pool.h"
@@ -69,7 +71,7 @@ namespace ecs::detail {
 
 		// Resets the runtime state. Removes all systems, empties component pools
 		void reset() {
-			std::unique_lock lock(mutex);
+			std::unique_lock<std::shared_mutex> lock(mutex);
 
 			systems.clear();
 			sched = scheduler();

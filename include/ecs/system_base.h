@@ -1,8 +1,9 @@
 #ifndef __SYSTEM_BASE
 #define __SYSTEM_BASE
 
-#include <span>
-#include <string>
+/*#include <span>
+#include <string>*/
+import std.core;
 #include "type_hash.h"
 
 namespace ecs::detail {

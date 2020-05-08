@@ -48,6 +48,11 @@
           "name": "BENCHMARK_ENABLE_INSTALL",
           "value": "False",
           "type": "BOOL"
+        },
+        {
+          "name": "BENCHMARK_ENABLE_EXCEPTIONS",
+          "value": "False",
+          "type": "BOOL"
         }
       ],
       "intelliSenseMode": "windows-msvc-x64"

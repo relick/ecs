@@ -1,10 +1,11 @@
 #ifndef __ENTITY_RANGE
 #define __ENTITY_RANGE
 
-#include <limits>
+/*#include <limits>
 #include <span>
 #include <optional>
-#include <algorithm>
+#include <algorithm>*/
+import std.core;
 
 #include "contract.h"
 #include "entity_id.h"

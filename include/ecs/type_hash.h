@@ -1,8 +1,9 @@
 #ifndef __TYPE_HASH
 #define __TYPE_HASH
 
-#include <cstdint>
-#include <string_view>
+/*#include <cstdint>
+#include <string_view>*/
+import std.core;
 
 // Beware of using this with local defined structs/classes
 // https://developercommunity.visualstudio.com/content/problem/1010773/-funcsig-missing-data-from-locally-defined-structs.html

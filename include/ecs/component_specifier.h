@@ -1,7 +1,8 @@
 #ifndef __COMPONENT_SPECIFIER
 #define __COMPONENT_SPECIFIER
 
-#include <type_traits>
+//#include <type_traits>
+import std.core;
 
 namespace ecs {
 	// Add this in 'ecs_flags()' to mark a component as a tag.
