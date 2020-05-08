@@ -1,7 +1,5 @@
-#include <complex>
-#include <iostream>
+import std.core;
 #include <ecs/ecs.h>
-#include <ecs/entity_range.h>
 
 // Based on https://solarianprogrammer.com/2013/02/28/mandelbrot-set-cpp-11/
 

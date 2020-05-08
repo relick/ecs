@@ -1,4 +1,4 @@
-#include <iostream>
+import std.core;
 #include <ecs/ecs.h>
 
 // This is a slightly altered version of the 'shared_components' example

@@ -22,12 +22,12 @@ endif ()
 
 if (MSVC)
     # warning level 4
-    target_compile_options(ecs INTERFACE /W4 /experimental:module -D_CPPUNWIND)
+    target_compile_options(ecs INTERFACE /W4 /experimental:module)
 
     # Disable C++ exceptions.
-    string(REGEX REPLACE "/EH[a-z]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs-c-")
-    add_definitions(-D_HAS_EXCEPTIONS=0)
+    #string(REGEX REPLACE "/EH[a-z]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHs-c-")
+    #add_definitions(-D_HAS_EXCEPTIONS=0)
 
     # Disable RTTI.
     #string(REGEX REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -69,8 +69,8 @@ target_link_libraries(ecs INTERFACE tls)
 if (ECS_STANDALONE_PROJECT)
     # Benchmark
     set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-    add_subdirectory ("benchmark/gbench")
-    add_subdirectory ("benchmark")
+    #add_subdirectory ("benchmark/gbench")
+    #add_subdirectory ("benchmark")
 
     # Examples
     add_subdirectory ("examples/entt_example")

@@ -1,5 +1,5 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
+#include <ecs/ecs.h>
 
 //
 // Test to make sure components are properly removed from systems.

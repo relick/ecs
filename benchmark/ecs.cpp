@@ -1,8 +1,7 @@
-#include <string>
-#include <random>
-#include <complex>
 #include <ecs/ecs.h>
 #include "gbench/include/benchmark/benchmark.h"
+
+import std.core;
 
 //size_t constexpr num_components = 32;
 //size_t constexpr num_components = 4 * 1024;

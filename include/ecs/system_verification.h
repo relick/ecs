@@ -1,10 +1,8 @@
 #ifndef __SYSTEM_VERIFICATION
 #define __SYSTEM_VERIFICATION
 
-/*#include <concepts>
-#include <type_traits>*/
-import std.core;
 #include "component_specifier.h"
+import std.core;
 
 namespace ecs::detail {
 	// Given a type T, if it is callable with an entity argument,

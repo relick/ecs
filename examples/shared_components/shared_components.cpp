@@ -1,4 +1,4 @@
-#include <iostream>
+import std.core;
 #include <ecs/ecs.h>
 
 struct A {};

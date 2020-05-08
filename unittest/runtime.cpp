@@ -1,5 +1,7 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
+#include <ecs/ecs.h>
+
+import std.core;
 
 struct runtime_ctr_counter {
 	inline static size_t def_ctr_count = 0;

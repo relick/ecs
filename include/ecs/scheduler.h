@@ -1,15 +1,11 @@
 #ifndef __SYSTEM_SCHEDULER
 #define __SYSTEM_SCHEDULER
 
-/*#include <vector>
-#include <execution>
-#include <algorithm>
-#include <mutex>*/
-import std.core;
-import std.threading;
-
 #include "system_base.h"
 #include "contract.h"
+
+import std.core;
+import std.threading;
 
 namespace ecs::detail {
     // Describes a node in the scheduler execution graph

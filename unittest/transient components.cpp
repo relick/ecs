@@ -1,5 +1,6 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
+#include <ecs/ecs.h>
+import std.core;
 
 struct _dummy { ecs_flags(ecs::transient); };
 

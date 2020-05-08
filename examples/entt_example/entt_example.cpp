@@ -1,3 +1,4 @@
+#include "ecs/type_hash.h"
 #include <ecs/ecs.h>
 
 // An example structured like the EnTT example from

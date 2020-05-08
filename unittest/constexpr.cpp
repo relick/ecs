@@ -1,6 +1,6 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
-#include <vector>
+#include <ecs/ecs.h>
+import std.core;
 
 // A bunch of tests to test constexpr-ness
 // Waiting for compiler support

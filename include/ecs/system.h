@@ -1,42 +1,37 @@
 #ifndef __SYSTEM
 #define __SYSTEM
 
-/*#include <type_traits>
-#include <tuple>
-#include <utility>
-#include <array>
-#include <vector>*/
-import std.core;
-
 #include "entity_id.h"
 #include "entity_range.h"
 #include "component_pool.h"
 #include "system_base.h"
 #include "type_hash.h"
 
+import std.core;
+
 namespace ecs::detail {
 	template <bool ignore_first_arg, typename First, typename ...Types>
-	constexpr auto get_type_hashes_array() {
+	auto get_type_hashes_array() {
 		if constexpr (!ignore_first_arg) {
-			std::array<detail::type_hash, 1+sizeof...(Types)> arr {get_type_hash<First>(), get_type_hash<Types>()...};
-			return arr;
+			static detail::type_hash const hashes[] = { get_type_hash<First>(), get_type_hash<Types>()... };
+			return hashes;
 		}
 		else {
-			std::array<detail::type_hash, sizeof...(Types)> arr {get_type_hash<Types>()...};
-			return arr;
+			static detail::type_hash const hashes[] = { get_type_hash<Types>()... };
+			return hashes;
 		}
 	}
 
 	template <bool ignore_first_arg, typename First, typename ...Types>
 	constexpr auto get_type_read_only() {
 		if constexpr (!ignore_first_arg) {
-			std::array<bool, 1 + sizeof...(Types)> arr {
+			static const bool arr[] = {
 				std::is_const_v<std::remove_reference_t<First>>,
 				std::is_const_v<std::remove_reference_t<Types>>...};
 			return arr;
 		}
 		else {
-			std::array<bool, sizeof...(Types)> arr {
+			static const bool arr[] = {
 				std::is_const_v<std::remove_reference_t<Types>>...};
 			return arr;
 		}
@@ -73,17 +68,17 @@ namespace ecs::detail {
 			std::tuple<entity_range, rcv<FirstComponent>*, rcv<Components>* ...>>;
 
 		// Component names
-		static constexpr std::array<std::string_view, num_arguments> argument_names (
+		static constexpr std::string_view argument_names[] = {
 			get_type_name<FirstComponent>(),
 			get_type_name<Components>()...
-		);
+		};
 
 		// Hashes of stripped types used by this system ('int' instead of 'int const&')
-		static constexpr std::array<detail::type_hash, num_components> type_hashes =
+		static inline detail::type_hash const* type_hashes = 
 			get_type_hashes_array<is_first_arg_entity, rcv<FirstComponent>, rcv<Components>...>();
 
 		// Contains true if a type is read-only
-		static constexpr std::array<bool, num_components> type_read_only =
+		static inline bool const* type_read_only =
 			get_type_read_only<is_first_arg_entity, FirstComponent, Components...>();
 
 		// Holds the arguments for a range of entities
@@ -161,11 +156,11 @@ namespace ecs::detail {
 		}
 
 		constexpr std::span<detail::type_hash const> get_type_hashes() const noexcept override {
-			return type_hashes;
+			return { type_hashes, num_arguments };
 		}
 
 		constexpr bool has_component(detail::type_hash hash) const noexcept override {
-			return type_hashes.end() != std::find(type_hashes.begin(), type_hashes.end(), hash);
+			return (type_hashes + num_arguments) != std::find(type_hashes, type_hashes + num_arguments, hash);
 		}
 
 		constexpr bool depends_on(system_base const* other) const noexcept override {
@@ -211,11 +206,11 @@ namespace ecs::detail {
 		}
 
 		constexpr bool writes_to_component(detail::type_hash hash) const noexcept override {
-			auto const it = std::find(type_hashes.begin(), type_hashes.end(), hash);
-			if (it == type_hashes.end())
+			auto const it = std::find(type_hashes, type_hashes + num_arguments, hash);
+			if (it == type_hashes + num_arguments)
 				return false;
 
-			return !type_read_only[std::distance(type_hashes.begin(), it)];
+			return !type_read_only[std::distance(type_hashes, it)];
 		}
 
 	protected:

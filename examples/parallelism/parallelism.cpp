@@ -1,6 +1,5 @@
-#include <iostream>
-#include <thread>
-#include <chrono>
+import std.core;
+import std.threading;
 #include <ecs/ecs.h>
 
 int main()

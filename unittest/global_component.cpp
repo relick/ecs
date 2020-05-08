@@ -1,5 +1,6 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
+#include <ecs/ecs.h>
+import std.core;
 
 TEST_CASE("Global component", "[component][global]") {
 	struct test_s {

@@ -1,6 +1,6 @@
 #include <ecs/ecs.h>
-#include <iostream>
-#include <thread>
+import std.core;
+import std.threading;
 
 using namespace std::chrono_literals;
 

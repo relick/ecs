@@ -1,5 +1,4 @@
-#include <iostream>
-#include <string>
+import std.core;
 #include <ecs/ecs.h>
 
 struct flameable_t { ecs_flags(ecs::tag); };

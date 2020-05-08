@@ -1,15 +1,11 @@
 #ifndef __ENTITY_RANGE
 #define __ENTITY_RANGE
 
-/*#include <limits>
-#include <span>
-#include <optional>
-#include <algorithm>*/
-import std.core;
 
 #include "contract.h"
 #include "entity_id.h"
 #include "entity_iterator.h"
+import std.core;
 
 namespace ecs {
 	// Defines a range of entities.
@@ -58,7 +54,7 @@ namespace ecs {
 
 		template <std::copyable Component>
 		[[nodiscard]] std::span<Component> get() const {
-			return std::span(get_component<Component>(first_), count());
+			return std::span<Component>(get_component<Component>(first_), count());
 		}
 
 		[[nodiscard]] constexpr entity_iterator begin() const {

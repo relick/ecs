@@ -1,11 +1,9 @@
 #ifndef __ENTITY_ITERATOR
 #define __ENTITY_ITERATOR
 
-/*#include <limits>
-#include <iterator>*/
-import std.core;
 #include "entity_id.h"
 #include "contract.h"
+import std.core;
 
 namespace ecs/*::detail*/ {
 

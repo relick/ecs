@@ -1,20 +1,14 @@
 #ifndef __COMPONENT_POOL
 #define __COMPONENT_POOL
 
-/*#include <concepts>
-#include <vector>
-#include <functional>
-#include <variant>
-#include <type_traits>
-#include <tuple>*/
-import std.core;
-
 #include <tls/splitter.h>
 
 #include "component_specifier.h"
 #include "component_pool_base.h"
 #include "entity_id.h"
 #include "entity_range.h"
+
+import std.core;
 
 namespace ecs::detail
 {
@@ -378,7 +372,7 @@ namespace ecs::detail
 			[[maybe_unused]] auto component_it = components.cbegin();
 			for (auto &add : adds)
 			{
-				entity_range const &range = std::get<0>(add);
+				entity_range const &range = std::get<entity_range>(add);
 
 				// Copy the current ranges while looking for an insertion point
 				while (ranges_it != ranges.cend() && (*ranges_it < range))
@@ -399,22 +393,18 @@ namespace ecs::detail
 				// Add the new range
 				add_range(new_ranges, range);
 
-				if constexpr (!unbound<T>)
-				{
-					auto const add_val = [this, &component_it, range](T &&val) {
-						component_it = components.insert(component_it, range.count(), std::forward<T>(val));
+				if constexpr (!unbound<T>) {
+					auto& init = std::get<variant>(add);
+					if (init.index() == 0) {
+						component_it = components.insert(component_it, range.count(), std::move(std::get<0>(init)));
 						component_it = std::next(component_it, range.count());
-					};
-					auto const add_init = [this, &component_it, range](std::function<T(entity_id)> init) {
-						for (entity_id ent = range.first(); ent <= range.last(); ++ent)
-						{
-							component_it = components.emplace(component_it, init(ent));
+					}
+					else {
+						for (entity_id ent = range.first(); ent <= range.last(); ++ent) {
+							component_it = components.emplace(component_it, std::get<1>(init)(ent));
 							component_it = std::next(component_it);
 						}
-					};
-
-					// Add the new components
-					std::visit(overloaded{add_val, add_init}, std::move(std::get<1>(add)));
+					}
 				}
 			}
 

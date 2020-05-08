@@ -1,18 +1,15 @@
 #ifndef __CONTEXT
 #define __CONTEXT
 
-/*#include <memory>
-#include <vector>
-#include <map>
-#include <shared_mutex>*/
-import std.core;
-import std.threading;
 #include <tls/cache.h>
 
 #include "component_pool.h"
 #include "system.h"
 #include "type_hash.h"
 #include "scheduler.h"
+
+import std.core;
+import std.threading;
 
 namespace ecs::detail {
 	// The central class of the ecs implementation. Maintains the state of the system.

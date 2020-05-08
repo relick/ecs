@@ -1,4 +1,4 @@
-#include <iostream>
+import std.core;
 #include <ecs/ecs.h>
 
 // Inspired by https://www.youtube.com/watch?v=gKbORJtnVu8

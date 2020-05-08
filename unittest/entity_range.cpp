@@ -1,5 +1,6 @@
-#include <ecs/ecs.h>
 #include "catch.hpp"
+#include <ecs/ecs.h>
+import std.core;
 
 // Intersects two ranges of entities
 // This lambda is used in system_impl

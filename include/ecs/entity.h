@@ -1,9 +1,8 @@
 #ifndef __ENTITY
 #define __ENTITY
 
-//#include <concepts>
-import std.core;
 #include "entity_id.h"
+import std.core;
 
 namespace ecs {
 	// A simple helper class for easing the adding and removing of components
