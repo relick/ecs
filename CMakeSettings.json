@@ -29,6 +29,20 @@
       "intelliSenseMode": "windows-msvc-x64"
     },
     {
+      "name": "MSVC Address Sanitizer",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_CROSSCOMPILING=1 -DRUN_HAVE_STD_REGEX=0 -DRUN_HAVE_POSIX_REGEX=0",
+      "buildCommandArgs": "",
+      "addressSanitizerEnabled": true,
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [],
+      "intelliSenseMode": "windows-msvc-x86"
+    },
+    {
       "name": "x64-Debug-clang",
       "generator": "Ninja",
       "configurationType": "Debug",
