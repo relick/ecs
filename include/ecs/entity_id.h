@@ -1,10 +1,12 @@
 #ifndef __ENTITY_ID
 #define __ENTITY_ID
 
+#include <cstddef>
+
 namespace ecs {
     namespace detail {
-        using entity_type = int;
-        using entity_offset = unsigned int; // must cover the entire entity_type domain
+        using entity_type = std::ptrdiff_t;
+        using entity_offset = std::size_t; // must cover the entire entity_type domain
     } // namespace detail
 
     // A simple struct that is an entity identifier.
