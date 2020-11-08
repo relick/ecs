@@ -35,7 +35,7 @@ int main() {
 Running this will do a Matthew McConaughey impression and print 'alright alright alright '.
 This is a fairly simplistic sample, but there are plenty of ways to extend it to do cooler things.
 
-Use this [Compiler explorer test link](https://godbolt.org/z/q81E5z) to try it out for yourself, using the [single-include header](include/ecs/ecs_sh.h).
+Use this [Compiler explorer test link](https://godbolt.org/z/jE6MTq) to try it out for yourself, using the [single-include header](include/ecs/ecs_sh.h).
 
 
 # Building 
@@ -44,9 +44,9 @@ The CI build status for msvc, clang 10, and gcc 10.1 is currently:
 * ![msvc 19.26](https://github.com/kgorking/ecs/workflows/msvc%2019.26/badge.svg?branch=split_ci_builds)
 * ![gcc 10.1](https://github.com/kgorking/ecs/workflows/gcc%2010.1/badge.svg?branch=split_ci_builds)
 * ![clang 10 ms-stl](https://github.com/kgorking/ecs/workflows/clang%2010%20ms-stl/badge.svg?branch=split_ci_builds)
-* ![clang 10 libc++](https://github.com/kgorking/ecs/workflows/clang%2010%20libc++/badge.svg?branch=split_ci_builds)
+* ![clang 11 libc++](https://github.com/kgorking/ecs/workflows/clang%2011%20libc++/badge.svg?branch=split_ci_builds)
   * `libc++` is missing `<concepts>` and the parallel stl implementation.
-* ![clang 10 libstdc++](https://github.com/kgorking/ecs/workflows/clang%2010%20libstdc++/badge.svg?branch=split_ci_builds)
+* ![clang 11 libstdc++](https://github.com/kgorking/ecs/workflows/clang%2011%20libstdc++/badge.svg?branch=split_ci_builds)
   * `libstdc++` is missing the `<span>` header.
 
 # Table of Contents
