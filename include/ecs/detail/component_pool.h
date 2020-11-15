@@ -11,7 +11,7 @@
 #include "tls/splitter.h"
 
 #include "component_pool_base.h"
-#include "../component_specifier.h"
+#include "flags.h"
 #include "../entity_id.h"
 #include "../entity_range.h"
 
@@ -302,12 +302,14 @@ namespace ecs::detail {
             deferred_adds.clear();
             deferred_init_adds.clear();
 
-            // Sort the input
-            auto constexpr comparator = [](auto const& l, auto const& r) {
-                return std::get<0>(l).first() < std::get<0>(r).first();
-            };
-            std::sort(std::execution::par, adds.begin(), adds.end(), comparator);
-            std::sort(std::execution::par, inits.begin(), inits.end(), comparator);
+            if constexpr (!std::is_same_v<parent, T>) { // don't sort hierarchies
+                // Sort the input
+                auto constexpr comparator = [](auto const& l, auto const& r) {
+                    return std::get<0>(l).first() < std::get<0>(r).first();
+                };
+                std::sort(std::execution::par, adds.begin(), adds.end(), comparator);
+                std::sort(std::execution::par, inits.begin(), inits.end(), comparator);
+            }
 
             // Check the 'add*' functions precondition.
             // An entity can not have more than one of the same component
