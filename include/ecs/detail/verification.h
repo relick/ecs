@@ -6,6 +6,7 @@
 
 #include "../flags.h"
 #include "../entity_id.h"
+#include "options.h"
 
 namespace ecs::detail {
     // Given a type T, if it is callable with an entity argument,
@@ -66,31 +67,31 @@ namespace ecs::detail {
             return true;
     }
 
-    // Implement the requirements for shared components
-    template<typename C>
-    constexpr bool req_shared() {
-        // Components flagged as 'share' must not be tags or global
-        if constexpr (detail::shared<C>)
-            return !detail::tagged<C> && !detail::global<C>;
-        else
-            return true;
-    }
-
     // Implement the requirements for global components
     template<typename C>
     constexpr bool req_global() {
         // Components flagged as 'global' must not be tags or shared
         // and must not be marked as 'transient'
         if constexpr (detail::global<C>)
-            return !detail::tagged<C> && !detail::shared<C> && !detail::transient<C>;
+            return !detail::tagged<C> && !detail::transient<C>;
         else
             return true;
     }
 
+    // Implement the requirements for ecs::parent components
+    template<typename C>
+    constexpr bool req_parent() {
+        // Parent components must always be passed as references
+        /*if constexpr (detail::is_parent<C>::value) {
+            return std::is_reference_v<C>;
+        }
+        else*/
+            return true;
+    }
+
+
     template<class C>
-    concept Component = requires {
-        requires(req_immutable<C>() && req_tagged<C>() && req_shared<C>() && req_global<C>());
-    };
+    concept Component = req_parent<C>() && req_immutable<C>() && req_tagged<C>() && req_global<C>();
 
 
     template<class R, class FirstArg, class... Args>

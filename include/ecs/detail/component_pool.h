@@ -10,10 +10,13 @@
 
 #include "tls/splitter.h"
 
-#include "component_pool_base.h"
-#include "flags.h"
 #include "../entity_id.h"
 #include "../entity_range.h"
+#include "parent_id.h"
+
+#include "component_pool_base.h"
+#include "flags.h"
+#include "options.h"
 
 template<class ForwardIt, class BinaryPredicate>
 ForwardIt std_combine_erase(ForwardIt first, ForwardIt last, BinaryPredicate p) {
@@ -72,7 +75,7 @@ namespace ecs::detail {
         // Pre: entities has not already been added, or is in queue to be added
         //      This condition will not be checked until 'process_changes' is called.
         void add(entity_range const range, T&& component) {
-            if constexpr (shared<T> || tagged<T>) {
+            if constexpr (tagged<T>) {
                 deferred_adds.local().push_back(range);
             } else {
                 deferred_adds.local().emplace_back(range, std::forward<T>(component));
@@ -302,14 +305,12 @@ namespace ecs::detail {
             deferred_adds.clear();
             deferred_init_adds.clear();
 
-            if constexpr (!std::is_same_v<parent, T>) { // don't sort hierarchies
-                // Sort the input
-                auto constexpr comparator = [](auto const& l, auto const& r) {
-                    return std::get<0>(l).first() < std::get<0>(r).first();
-                };
-                std::sort(std::execution::par, adds.begin(), adds.end(), comparator);
-                std::sort(std::execution::par, inits.begin(), inits.end(), comparator);
-            }
+            // Sort the input
+            auto constexpr comparator = [](auto const& l, auto const& r) {
+                return std::get<0>(l).first() < std::get<0>(r).first();
+            };
+            std::sort(std::execution::par, adds.begin(), adds.end(), comparator);
+            std::sort(std::execution::par, inits.begin(), inits.end(), comparator);
 
             // Check the 'add*' functions precondition.
             // An entity can not have more than one of the same component

@@ -16,10 +16,6 @@ add_executable (test_runtime "runtime.cpp")
 target_link_libraries(test_runtime ecs)
 add_test(test_runtime test_runtime)
 
-add_executable (test_shared_component "shared_component.cpp")
-target_link_libraries(test_shared_component ecs)
-add_test(test_shared_component test_shared_component)
-
 add_executable (test_systems "system.cpp")
 target_link_libraries(test_systems ecs)
 add_test(test_systems test_systems)
@@ -51,3 +47,7 @@ add_test(test_system_options test_system_options)
 add_executable (test_frequency "frequency.cpp")
 target_link_libraries(test_frequency ecs)
 add_test(test_frequency test_frequency)
+
+add_executable (test_hierarchy "hierarchy.cpp")
+target_link_libraries(test_hierarchy ecs)
+add_test(test_hierarchy test_hierarchy)
