@@ -32,6 +32,7 @@ int main() {
     ecs::update();
 }
 ```
+
 Running this will do a Matthew McConaughey impression and print 'alright alright alright '.
 This is a fairly simplistic sample, but there are plenty of ways to extend it to do cooler things.
 
@@ -64,9 +65,9 @@ The CI build status for msvc, clang 10, and gcc 10.1 is currently:
   - [Committing component changes](#committing-component-changes)
 - [Systems](#systems)
   - [Requirements and rules](#requirements-and-rules)
+  - [The current entity](#the-current-entity)
   - [Parallel-by-default systems](#parallel-by-default-systems)
   - [Automatic concurrency](#automatic-concurrency)
-  - [The current entity](#the-current-entity)
   - [Sorting](#sorting)
   - [Filtering](#filtering)
   - [Hierarchies](#hierarchies)
@@ -155,11 +156,30 @@ By deferring the components changes to entities, it is possible to safely add an
 
 
 # Systems
-Systems holds the logic that operates on components that are attached to entities.
+Systems holds the logic that operates on components that are attached to entities, and are built using `ecs::make_system` by passing it a lambda or a free-standing function.
 
-A system is built from a user-provided lambda using the function `ecs::make_system`. Systems can operate on as many components as you need; there is no limit.
+```cpp
+#include <ecs/ecs.h>
 
-Accessing components in systems is done through *references*. If you forget to do so, you will get a compile-time error to remind you.
+struct component1;
+struct component2;
+struct component3;
+
+void read_only_system(component1 const&) { /* logic */ }
+auto read_write_system = [](component1&, component2 const&) { /* logic */ }
+
+int main() {
+    ecs::make_system(read_only_system);
+    ecs::make_system(read_write_system);
+    ecs::make_system([](component2&, component3&) { // read/write to two components
+        /* logic */
+    });
+}
+```
+
+Systems can operate on as many components as you need; there is no limit.
+
+Accessing large components in systems should be done through references to avoid unnecessary copying of the components data.
 
 Remember to mark components you don't intend to change in a system as `const`, as this will help the sceduler by allowing the system to run concurrently with other systems that also only reads from the component. There is more information available in the [automatic concurrency](#Automatic-concurrency) section.
 
@@ -170,6 +190,15 @@ There are a few requirements and restrictions put on the lambdas:
 * **No return values.** Systems are not permitted to have return values, because it logically does not make any sense. Systems with return types other than `void` will result in a compile time error.
 * **At least one component parameter.** Systems operate on components, so if none is provided it will result in a compile time error.
 * **No duplicate components.** Having the same component more than once in the parameter list is likely an error on the programmers side, so a compile time error will be raised. 
+
+## The current entity
+If you need access to the entity currently being processed by a system, make the first parameter type an `ecs::entity_id`. The entity will only be passed as a value, so trying to accept it as anything else will result in a compile time error.
+
+```cpp
+ecs::make_system([](ecs::entity_id ent, greeting const& g) {
+    std::cout << "entity with id " << ent << " says: " << g.msg << '\n';
+});
+```
 
 
 ## Parallel-by-default systems
@@ -191,26 +220,17 @@ If a component is read from, the system that previously wrote to it becomes a de
 
 Multiple systems that read from the same component can safely run concurrently.
 
-## The current entity
-If you need access to the entity currently being processed by a system, make the first parameter type an `ecs::entity_id`. The entity will only be passed as a value, so trying to accept it as anything else will result in a compile time error.
-
-```cpp
-ecs::make_system([](ecs::entity_id ent, greeting const& g) {
-    std::cout << "entity with id " << ent << " says: " << g.msg << '\n';
-});
-```
-
 
 ## Sorting
 An additional function object can be passed along to `ecs::make_system` to specify the order in which components are processed. It must adhere to the [*Compare*](https://en.cppreference.com/w/cpp/named_req/Compare) requirements.
 
 ```cpp
-// sort ascending
+// sort descending
 auto &sys_dec = ecs::make_system(
     [](int const&) { /* ... */ },
     std::less<int>());
 
-// sort descending
+// sort ascending
 auto & sys_asc = ecs::make_system(
     [](int const&) { /* ... */ },
     std::greater<int>());
@@ -245,7 +265,7 @@ More than one filter can be present; there is no limit.
 ## Hierarchies
 Hierarchies can be created by adding the special component `ecs::parent` to an entity:
 ```cpp
-add_component({1}, parent{0});
+add_component({1}, ecs::parent{0});
 ```
 This alone does not create a hierarchy, but it makes it possible for systems to act on this relationship data. To access the parent component in a system, add a `ecs::parent<>` parameter:
 
@@ -267,41 +287,38 @@ add_component(2, short{10});
 add_component(3, long{20});
 add_component(4, float{30});
 
-add_component({5, 7}, parent{2});  // short children, parent 2 has a short
-add_component({7, 9}, parent{3});  // long children, parent 3 has a long
-add_component({9, 11}, parent{4}); // float children, parent 4 has a float
+add_component({5, 7}, ecs::parent{2});  // short children, parent 2 has a short
+add_component({7, 9}, ecs::parent{3});  // long children, parent 3 has a long
+add_component({9, 11}, ecs::parent{4}); // float children, parent 4 has a float
 
 // Systems that only runs on entities that has a parent with a specific component,
-make_system([](parent<short> const& p) { /* 10 == p.get<short>() */ });  // runs on entities 5-7
-make_system([](parent<long>  const& p) { /* 20 == p.get<long>() */ });   // runs on entities 7-9
-make_system([](parent<float> const& p) { /* 30 == p.get<float>() */ });  // runs on entities 9-11
-make_system([](parent<short, long> const& p) { // runs on entity 7
+make_system([](ecs::parent<short> const& p) { /* 10 == p.get<short>() */ });  // runs on entities 5-7
+make_system([](ecs::parent<long>  const& p) { /* 20 == p.get<long>() */ });   // runs on entities 7-9
+make_system([](ecs::parent<float> const& p) { /* 30 == p.get<float>() */ });  // runs on entities 9-11
+make_system([](ecs::parent<short, long> const& p) { // runs on entity 7
   /* 10 == p.get<short>() */
   /* 20 == p.get<long>() */
 ); 
 
 // Fails
-//make_system([](parent<short> const& p) { p.get<int>(); });  // will not compile; no 'int' in 'p'
+//make_system([](ecs::parent<short> const& p) { p.get<int>(); });  // will not compile; no 'int' in 'p'
 ```
 
 ### Filtering on parents components
 Filters work like regular system filters and can be specified on a parents sub-components:
 ```cpp
-make_system([](parent<short*> p) { });  // runs on entities 8-13
+make_system([](ecs::parent<short*> p) { });  // runs on entities 7-11
 ```
 An `ecs::parent` that only consist of filters does not need to be passed as a reference.
 
 
 Marking the parent itself as a filter means that any entity with a parent component on it will be ignored. Any sub-components specified are ignored.
 ```cpp
-make_system([](int, parent<> *p) { });  // runs on entities with an int and no parents
+make_system([](int, ecs::parent<> *p) { });  // runs on entities with an int and no parents
 ```
 
 ### Traversal and layout
-Hiearchies in this library are depth-first-search order. Nodes are visited from lowest-to-highest entity id; see the [hierarchy unittest](unittest/hierarchy.cpp) for the expected order of traversal.
-
-Due to the nature of ecs, a child in a hiearchy can not have more than one parent, because an entity can not have more one of the same type of `ecs::parent` component. This could be remedied in the future with someting like an `ecs::multi_parent` component, if the need arises.
-
+Hiearchies in this library are [topological sorted](https://en.wikipedia.org/wiki/Topological_sorting) and can be processed in parallel. An entity's parent is always processed before the entity itself.
 
 
 # System options

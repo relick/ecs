@@ -1,5 +1,7 @@
 #include <complex>
 #include <ecs/ecs.h>
+
+#include "global.h"
 #include "gbench/include/benchmark/benchmark.h"
 
 // https://docs.unrealengine.com/en-US/Resources/ContentExamples/EffectsGallery/1_D/index.html
@@ -8,15 +10,15 @@
 // https://docs.unrealengine.com/en-US/Resources/ContentExamples/EffectsGallery/2_E/index.html
 
 constexpr float delta_time = 1.0f / 60.0f;
-constexpr int num_frames = 100;
-constexpr int max_num_particles = 5'000;
+
+using namespace ecs::flag;
 
 struct particle { float x, y; };
 struct color    { float r, g, b; };
 struct velocity { float x, y; };
 struct life     { float val; };
-struct dead_tag { ecs_flags(ecs::flag::tag, ecs::flag::transient); };
-struct gravity  { ecs_flags(ecs::flag::global); float g = 0.2f; };
+struct dead_tag { ecs_flags(tag, transient); };
+struct gravity  { ecs_flags(global); float g = 0.2f; };
 
 // Helper lambda to initialize a particle
 auto constexpr particle_init = [](ecs::entity_id) -> particle {
@@ -111,15 +113,17 @@ void make_systems() {
 }
 
 void particles(benchmark::State& state) {
+	auto const num_particles = static_cast<ecs::detail::entity_type>(state.range(0));
+
     ecs::detail::_context.reset();
     make_systems();
-    ecs::add_component({0, max_num_particles}, particle_init, velocity_init, color_init, life_init);
+	ecs::add_component({0, num_particles}, particle_init, velocity_init, color_init, life_init);
     ecs::commit_changes();
 
     for ([[maybe_unused]] auto const _ : state) {
-        for (int i = 0; i < num_frames; i++) {
-			ecs::update();
-		}
+		ecs::update();
 	}
+
+	state.SetItemsProcessed(state.iterations() * num_particles);
 }
-BENCHMARK(particles);
+ECS_BENCHMARK(particles);

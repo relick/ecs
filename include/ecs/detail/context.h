@@ -9,10 +9,12 @@
 #include "component_pool.h"
 #include "scheduler.h"
 #include "system.h"
+#include "system_global.h"
+#include "system_hierachy.h"
+#include "system_ranged.h"
+#include "system_sorted.h"
 #include "tls/cache.h"
 #include "type_hash.h"
-
-#include "builder_selector.h"
 
 namespace ecs::detail {
     // The central class of the ecs implementation. Maintains the state of the system.
@@ -106,6 +108,13 @@ namespace ecs::detail {
             return *static_cast<component_pool<std::remove_pointer_t<std::remove_cvref_t<T>>>*>(pool);
         }
 
+        // Regular function
+        template<typename Options, typename UpdateFn, typename SortFn, typename R, typename FirstArg,
+            typename... Args>
+        auto& create_system(UpdateFn update_func, SortFn sort_func, R(FirstArg, Args...)) {
+            return create_system<Options, UpdateFn, SortFn, FirstArg, Args...>(update_func, sort_func);
+        }
+
         // Const lambda with sort
         template<typename Options, typename UpdateFn, typename SortFn, typename R, typename C, typename FirstArg,
             typename... Args>
@@ -153,7 +162,6 @@ namespace ecs::detail {
 
         template<typename Options, typename UpdateFn, typename SortFn, typename FirstComponent, typename... Components>
         auto& create_system(UpdateFn update_func, SortFn sort_func) {
-
             // Find potential parent type
             using parent_type = test_option_type_or<is_parent,
                 std::tuple< std::remove_cvref_t<FirstComponent>,
@@ -167,12 +175,6 @@ namespace ecs::detail {
 
             // Global systems cannot have a sort function
             static_assert(!(is_global_sys == has_sort_func && is_global_sys), "Global systems can not be sorted");
-
-            // Make sure we have a valid sort function
-            if constexpr (has_sort_func) {
-                static_assert(
-                    detail::sorter<SortFn>, "Invalid sort-function supplied, should be 'bool(T const&, T const&)'");
-            }
 
             static_assert(!(has_sort_func == has_parent && has_parent == true), "Systems can not both be hierarchial and sorted");
 
@@ -199,31 +201,24 @@ namespace ecs::detail {
                         }
                     }, pt);
 
-                using argument_builder = builder_hierarchy_argument<Options, UpdateFn, SortFn, decltype(all_pools), FirstComponent, Components...>;
-                using typed_system = system<Options, UpdateFn, SortFn, argument_builder, FirstComponent, Components...>;
-                sys = std::make_unique<typed_system>(update_func, sort_func, all_pools);
+                using typed_system = system_hierarchy<Options, UpdateFn, decltype(all_pools), FirstComponent, Components...>;
+                sys = std::make_unique<typed_system>(update_func, all_pools);
             } else if constexpr (is_global_sys) {
-                using argument_builder =
-                    builder_global_argument<Options, UpdateFn, SortFn, FirstComponent, Components...>;
-                using typed_system = system<Options, UpdateFn, SortFn, argument_builder, FirstComponent, Components...>;
-
                 auto pools = make_tuple_pools<FirstComponent, Components...>();
-                sys = std::make_unique<typed_system>(update_func, sort_func, pools);
+                using typed_system = system_global<Options, UpdateFn, decltype(pools), FirstComponent, Components...>;
+                sys = std::make_unique<typed_system>(update_func, pools);
             } else if constexpr (has_sort_func) {
-                using argument_builder = builder_sorted_argument<Options, UpdateFn, SortFn, FirstComponent, Components...>;
-                using typed_system = system<Options, UpdateFn, SortFn, argument_builder, FirstComponent, Components...>;
-
-                auto pools = make_tuple_pools<reduce_parent_t<FirstComponent>, reduce_parent_t<Components>...>();
+                auto pools = make_tuple_pools<FirstComponent, Components...>();
+                using typed_system = system_sorted<Options, UpdateFn, SortFn, decltype(pools), FirstComponent, Components...>;
                 sys = std::make_unique<typed_system>(update_func, sort_func, pools);
             } else {
-                using argument_builder = builder_ranged_argument<Options, UpdateFn, SortFn, FirstComponent, Components...>;
-                using typed_system = system<Options, UpdateFn, SortFn, argument_builder, FirstComponent, Components...>;
-
                 auto pools = make_tuple_pools<reduce_parent_t<FirstComponent>, reduce_parent_t<Components>...>();
-                sys = std::make_unique<typed_system>(update_func, sort_func, pools);
+                using typed_system = system_ranged<Options, UpdateFn, decltype(pools), FirstComponent, Components...>;
+                sys = std::make_unique<typed_system>(update_func, pools);
             }
 
             std::unique_lock lock(mutex);
+            sys->process_changes(true);
             systems.push_back(std::move(sys));
             detail::system_base* ptr_system = systems.back().get();
             Ensures(ptr_system != nullptr);
