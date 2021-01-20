@@ -31,10 +31,15 @@ namespace ecs {
                 static_assert(!std::is_same_v<ComponentType, void>,
                     "Initializer functions must return a component");
 
-                // Add it to the component pool
-                detail::component_pool<ComponentType>& pool =
-                    detail::_context.get_component_pool<ComponentType>();
-                pool.add_init(range, std::forward<Type>(val));
+                if constexpr (detail::is_parent<ComponentType>::value) {
+                    auto const converter = [val](entity_id id) { return detail::parent_id{val(id).id()}; };
+
+                    auto& pool = detail::_context.get_component_pool<detail::parent_id>();
+                    pool.add_init(range, converter);
+                } else {
+                    auto& pool = detail::_context.get_component_pool<ComponentType>();
+                    pool.add_init(range, std::forward<Type>(val));
+                }
             } else {
                 // Add it to the component pool
                 if constexpr (detail::is_parent<Type>::value) {
@@ -172,11 +177,27 @@ namespace ecs {
     }
 
     // Make a new system
-    template<typename... Options, detail::lambda UpdateFn, typename SortFn = std::nullptr_t>
-    auto& make_system(UpdateFn update_func, SortFn sort_func = nullptr) {
+    template<typename... Options, typename SystemFunc, typename SortFn = std::nullptr_t>
+    auto& make_system(SystemFunc sys_func, SortFn sort_func = nullptr) {
         using opts = std::tuple<Options...>;
-        return detail::_context.create_system<opts, UpdateFn, SortFn>(
-            update_func, sort_func, &UpdateFn::operator());
+
+        // verify the input
+        detail::make_system_parameter_verifier<opts, SystemFunc, SortFn>();
+
+        if constexpr (ecs::detail::type_is_function<SystemFunc>) {
+            // Build from regular function
+            return detail::_context.create_system<opts, SystemFunc, SortFn>(sys_func, sort_func, sys_func);
+        } else if constexpr (ecs::detail::type_is_lambda<SystemFunc>) {
+            // Build from lambda
+            return detail::_context.create_system<opts, SystemFunc, SortFn>(
+                sys_func, sort_func, &SystemFunc::operator());
+        } else {
+            (void) sys_func;
+            (void) sort_func;
+            struct _invalid_system_type {
+            } invalid_system_type;
+            return invalid_system_type;
+        }
     }
 } // namespace ecs
 
