@@ -1,5 +1,5 @@
-#ifndef ECS_CONTRACT
-#define ECS_CONTRACT
+#ifndef __CONTRACT
+#define __CONTRACT
 
 // Contracts. If they are violated, the program is an invalid state, so nuke it from orbit
 #ifndef Expects
@@ -9,4 +9,4 @@
 #define Ensures(cond) do { ((cond) ? static_cast<void>(0) : std::terminate()); } while(false)
 #endif
 
-#endif // !ECS_CONTRACT
+#endif // !__CONTRACT

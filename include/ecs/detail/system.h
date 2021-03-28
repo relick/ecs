@@ -1,5 +1,5 @@
-#ifndef ECS_SYSTEM
-#define ECS_SYSTEM
+#ifndef __SYSTEM
+#define __SYSTEM
 
 #include <array>
 #include <tuple>
@@ -226,4 +226,4 @@ namespace ecs::detail {
     };
 } // namespace ecs::detail
 
-#endif // !ECS_SYSTEM
+#endif // !__SYSTEM

@@ -1,5 +1,5 @@
-#ifndef ECS_FREQLIMIT_H
-#define ECS_FREQLIMIT_H
+#ifndef __FREQLIMIT_H
+#define __FREQLIMIT_H
 
 #include <chrono>
 
@@ -29,4 +29,4 @@ namespace ecs::detail {
     };
 }
 
-#endif // !ECS_FREQLIMIT_H
+#endif // !__FREQLIMIT_H

@@ -1,5 +1,5 @@
-#ifndef ECS_ENTITY_ITERATOR
-#define ECS_ENTITY_ITERATOR
+#ifndef __ENTITY_ITERATOR
+#define __ENTITY_ITERATOR
 
 #include "contract.h"
 #include "../entity_id.h"
@@ -74,4 +74,4 @@ namespace ecs::detail {
     };
 } // namespace ecs
 
-#endif // !ECS_ENTITY_RANGE
+#endif // !__ENTITY_RANGE

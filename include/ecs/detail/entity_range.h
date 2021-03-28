@@ -1,5 +1,5 @@
-#ifndef ECS_DETAIL_ENTITY_RANGE
-#define ECS_DETAIL_ENTITY_RANGE
+#ifndef __DETAIL_ENTITY_RANGE
+#define __DETAIL_ENTITY_RANGE
 
 #include "../entity_range.h"
 
@@ -107,4 +107,4 @@ namespace ecs::detail {
     }
 } // namespace ecs::detail
 
-#endif // !ECS_DETAIL_ENTITY_RANGE
+#endif // !__DETAIL_ENTITY_RANGE

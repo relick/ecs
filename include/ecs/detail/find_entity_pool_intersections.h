@@ -1,5 +1,5 @@
-#ifndef ECS_FIND_ENTITY_POOL_INTERSECTIONS_H
-#define ECS_FIND_ENTITY_POOL_INTERSECTIONS_H
+#ifndef __FIND_ENTITY_POOL_INTERSECTIONS_H
+#define __FIND_ENTITY_POOL_INTERSECTIONS_H
 
 #include <vector>
 #include "../entity_range.h"
@@ -59,4 +59,4 @@ namespace ecs::detail {
 
 } // namespace ecs::detail
 
-#endif // !ECS_FIND_ENTITY_POOL_INTERSECTIONS_H
+#endif // !__FIND_ENTITY_POOL_INTERSECTIONS_H

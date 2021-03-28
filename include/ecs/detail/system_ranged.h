@@ -1,5 +1,5 @@
-#ifndef ECS_SYSTEM_RANGED_H_
-#define ECS_SYSTEM_RANGED_H_
+#ifndef __SYSTEM_RANGED_H_
+#define __SYSTEM_RANGED_H_
 
 #include "pool_range_walker.h"
 #include "system.h"
@@ -61,4 +61,4 @@ private:
 };
 } // namespace ecs::detail
 
-#endif // !ECS_SYSTEM_RANGED_H_
+#endif // !__SYSTEM_RANGED_H_

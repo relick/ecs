@@ -1,5 +1,5 @@
-#ifndef ECS_CONTEXT
-#define ECS_CONTEXT
+#ifndef __CONTEXT
+#define __CONTEXT
 
 #include <map>
 #include <memory>
@@ -264,4 +264,4 @@ namespace ecs::detail {
     static inline context& _context = get_context();
 } // namespace ecs::detail
 
-#endif // !ECS_CONTEXT
+#endif // !__CONTEXT

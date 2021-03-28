@@ -1,5 +1,5 @@
-#ifndef ECS_SYSTEM_BASE
-#define ECS_SYSTEM_BASE
+#ifndef __SYSTEM_BASE
+#define __SYSTEM_BASE
 
 #include <span>
 #include <string>
@@ -78,4 +78,4 @@ namespace ecs::detail {
     };
 } // namespace ecs
 
-#endif // !ECS_SYSTEM_BASE
+#endif // !__SYSTEM_BASE

@@ -1,5 +1,5 @@
-#ifndef ECS_ENTITY_ID
-#define ECS_ENTITY_ID
+#ifndef __ENTITY_ID
+#define __ENTITY_ID
 
 #include <cstddef>
 
@@ -30,4 +30,4 @@ namespace ecs {
     };
 } // namespace ecs
 
-#endif // !ECS_ENTITY_ID
+#endif // !__ENTITY_ID
