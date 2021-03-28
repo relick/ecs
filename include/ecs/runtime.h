@@ -1,5 +1,5 @@
-#ifndef __RUNTIME
-#define __RUNTIME
+#ifndef ECS_RUNTIME
+#define ECS_RUNTIME
 
 #include <concepts>
 #include <execution>
@@ -201,4 +201,4 @@ namespace ecs {
     }
 } // namespace ecs
 
-#endif // !__RUNTIME
+#endif // !ECS_RUNTIME
