@@ -1,5 +1,5 @@
-#ifndef __ENTITY_RANGE
-#define __ENTITY_RANGE
+#ifndef ECS_ENTITY_RANGE
+#define ECS_ENTITY_RANGE
 
 #include <algorithm>
 #include <limits>
@@ -159,4 +159,4 @@ namespace ecs {
 
 } // namespace ecs
 
-#endif // !__ENTITTY_RANGE
+#endif // !ECS_ENTITTY_RANGE
