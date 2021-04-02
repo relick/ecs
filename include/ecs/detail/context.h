@@ -35,8 +35,9 @@ namespace ecs::detail {
             //  adding components
             //  registering new component types
             //  adding new systems
-            std::shared_lock lock_system(system_mutex);
-            std::shared_lock lock_component_pool(component_pool_mutex);
+            std::shared_lock system_lock(system_mutex, std::defer_lock);
+            std::unique_lock component_pool_lock(component_pool_mutex, std::defer_lock);
+            std::lock(system_lock, component_pool_lock); // lock both without deadlock
 
             auto constexpr process_changes = [](auto const& inst) { inst->process_changes(); };
 
@@ -75,8 +76,9 @@ namespace ecs::detail {
 
         // Resets the runtime state. Removes all systems, empties component pools
         void reset() {
-            std::unique_lock lock_system(system_mutex);
-            std::unique_lock lock_component_pool(component_pool_mutex);
+            std::unique_lock system_lock(system_mutex, std::defer_lock);
+            std::unique_lock component_pool_lock(component_pool_mutex, std::defer_lock);
+            std::lock(system_lock, component_pool_lock); // lock both without deadlock
 
             systems.clear();
             sched = scheduler();
