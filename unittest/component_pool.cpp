@@ -111,7 +111,7 @@ TEST_CASE("Component pool specification", "[component]") {
 
     SECTION("Removing components") {
         ecs::detail::component_pool<int> pool;
-        pool.add_init({0, 10}, [](auto ent) { return int{ent}; });
+        pool.add_init({0, 10}, [](auto ent) { return static_cast<int>(ent); });
         pool.process_changes();
 
         SECTION("from the back does not invalidate other components") {
@@ -149,7 +149,7 @@ TEST_CASE("Component pool specification", "[component]") {
 
     SECTION("A non empty pool") {
         ecs::detail::component_pool<int> pool;
-        pool.add_init({0, 9}, [](auto ent) { return int{ent}; });
+        pool.add_init({0, 9}, [](auto ent) { return static_cast<int>(ent); });
         pool.process_changes();
 
         SECTION("has the correct entities") {

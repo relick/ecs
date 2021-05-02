@@ -92,7 +92,7 @@ TEST_CASE("The runtime interface") {
 
         SECTION("of components with initializer works") {
             ecs::detail::_context.reset();
-            auto const init = [](auto ent) -> range_add { return {ent * 2}; };
+            auto const init = [](auto ent) -> range_add { return {static_cast<int>(ent * 2)}; };
 
             ecs::add_component({10, 15}, init);
             ecs::entity_range const ents{16, 20};
