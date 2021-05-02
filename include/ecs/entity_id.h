@@ -11,25 +11,25 @@ namespace ecs {
 
     // A simple struct that is an entity identifier.
     struct entity_id {
+        using offset = detail::entity_offset;
+        using value = detail::entity_type;
+
         // Uninitialized entity ids are not allowed, because they make no sense
         entity_id() = delete;
 
-        constexpr entity_id(detail::entity_type _id) noexcept
+        constexpr entity_id(value _id) noexcept
             : id(_id) {
         }
 
-        constexpr operator detail::entity_type & () noexcept {
+        constexpr operator value& () noexcept {
             return id;
         }
-        constexpr operator detail::entity_type const& () const noexcept {
+        constexpr operator value const& () const noexcept {
             return id;
         }
-
-        using offset = detail::entity_offset;
-        using type = detail::entity_type;
 
     private:
-        detail::entity_type id;
+        value id;
     };
 } // namespace ecs
 

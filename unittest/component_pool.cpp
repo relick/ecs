@@ -74,7 +74,7 @@ TEST_CASE("Component pool specification", "[component]") {
         }
         SECTION("with a lambda is valid") {
             ecs::detail::component_pool<int> pool;
-            pool.add_init({0, 9}, [](ecs::entity_id ent) { return int{ent}; });
+            pool.add_init({0, 9}, [](ecs::entity_id ent) { return static_cast<int>(ent); });
             pool.process_changes();
 
             for (int i = 0; i <= 9; i++) { CHECK(i == *pool.find_component_data(i)); }

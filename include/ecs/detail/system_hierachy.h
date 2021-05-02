@@ -86,7 +86,7 @@ private:
 
 			while (!walker.done()) {
 				entity_id const entity = walker.get_entity();
-				uint32_t const ent_offset = conv.to_offset(entity);
+				entity_id::offset const ent_offset = conv.to_offset(entity);
 
 				info_iterator const ent_info = fill_entity_info(info, entity, index);
 
