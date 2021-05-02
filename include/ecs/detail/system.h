@@ -70,21 +70,6 @@ public:
 		return group::group_id;
 	}
 
-	std::string get_signature() const noexcept override {
-		// Component names
-		constexpr std::array<std::string_view, num_arguments> argument_names{get_type_name<FirstComponent>(),
-																			 get_type_name<Components>()...};
-
-		std::string sig("system(");
-		for (size_t i = 0; i < num_arguments - 1; i++) {
-			sig += argument_names[i];
-			sig += ", ";
-		}
-		sig += argument_names[num_arguments - 1];
-		sig += ')';
-		return sig;
-	}
-
 	constexpr std::span<detail::type_hash const> get_type_hashes() const noexcept override {
 		return type_hashes;
 	}
@@ -235,7 +220,10 @@ protected:
 	using stripped_component_list = type_list<std::remove_cvref_t<FirstComponent>, std::remove_cvref_t<Components>...>;
 
 	using user_freq = test_option_type_or<is_frequency, Options, opts::frequency<0>>;
-	frequency_limiter<user_freq::hz> frequency;
+	using frequency_type = std::conditional_t<(user_freq::hz > 0),
+		frequency_limiter<user_freq::hz>,
+		no_frequency_limiter>;
+	frequency_type frequency;
 
 	// Number of arguments
 	static constexpr size_t num_arguments = 1 + sizeof...(Components);

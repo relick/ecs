@@ -19,6 +19,7 @@ endif ()
 if (MSVC)
     # warning level 4
     target_compile_options(ecs INTERFACE /std:c++latest /W4 /wo4648)
+    #target_compile_options(ecs INTERFACE /fsanitize=address)
 
     # enable profiling
     #target_compile_options(ecs INTERFACE /Zi)
@@ -34,17 +35,22 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
 else()
     # lots of warnings
-    target_compile_options(ecs INTERFACE -std=c++2a -Wall -Wextra -pedantic ${STDLIB})
+    target_compile_options(ecs INTERFACE -std=c++2a -Wall -Wextra -Wpedantic -Wshadow ${STDLIB})
     target_link_options(ecs INTERFACE -pthread)
 
     # Disable C++ exceptions.
     # - fails to compile on gcc 10
-    #string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+    if (Clang)
+        string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+    endif()
 
     # Disable RTTI.
-    #string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+    # - clang's std::function::target needs rtti -_-
+    if (GNU)
+        string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+    endif()
 endif()
 
 # Project headers
