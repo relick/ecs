@@ -1,7 +1,7 @@
 #ifndef ECS_ENTITY_ID
 #define ECS_ENTITY_ID
 
-#include <cstdint>
+#include <cstddef>
 
 namespace ecs {
     namespace detail {
