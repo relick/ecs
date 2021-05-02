@@ -5,8 +5,8 @@
 
 namespace ecs {
     namespace detail {
-        using entity_type = std::size_t;
-        using entity_offset = std::ptrdiff_t; // must cover the entire entity_type domain
+        using entity_type = std::ptrdiff_t;
+        using entity_offset = std::size_t; // must cover the entire entity_type domain
     } // namespace detail
 
     // A simple struct that is an entity identifier.
@@ -24,6 +24,9 @@ namespace ecs {
         constexpr operator detail::entity_type const& () const noexcept {
             return id;
         }
+
+        using offset = detail::entity_offset;
+        using type = detail::entity_type;
 
     private:
         detail::entity_type id;
